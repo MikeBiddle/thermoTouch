@@ -258,6 +258,18 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
+uint32_t lastTick100ms;
+
+bool elapsed100ms()
+{
+	uint32_t t=HAL_GetTick()-lastTick100ms;
+	if(t<100)
+		return false;
+	lastTick100ms=HAL_GetTick();
+	return true;
+}
+
+
 int main(void) {
 	uint8_t lcd_status = LCD_OK;
 
@@ -274,10 +286,14 @@ int main(void) {
 
 	modbusInit(19200);
 	mainScreenInit();
+	rtcInit();
 
 	while (1) {
-		DrawMainScreen();
-		checkTouch();
+		if(elapsed100ms())
+		{
+			updateScreen();
+			checkTouch();
+		}
 		modbusUpdate();
 	}
 
