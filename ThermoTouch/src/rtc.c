@@ -6,6 +6,7 @@
  */
 
 #include "rtc.h"
+#include <stdio.h>
 
 struct TClock now;
 char tString[20];
@@ -65,6 +66,6 @@ void incTime()
 uint8_t* rtcTimeString()
 {
 	incTime();
-	sprintf(tString,"%2X:%.2.2X:%2.2X",now.hh,now.mm,now.ss);
+	sprintf(tString,"%2X:%2.2X:%2.2X",now.hh,now.mm,now.ss);
 	return (uint8_t*)tString;
 }
