@@ -108,7 +108,7 @@ void modbusUpdate(void)
 
 }
 
-void modbusWriteHoldingReg(uint16_t ad,uint16_t value)
+void modbusWriteHoldingReg(uint16_t reg,uint16_t value)
 {
 	  uint8_t aTxBuffer[] = " **** UART_TwoBoards_ComPolling ****  **** UART_TwoBoards_ComPolling ****  **** UART_TwoBoards_ComPolling **** ";
 

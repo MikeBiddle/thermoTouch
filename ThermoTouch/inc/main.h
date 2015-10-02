@@ -50,6 +50,7 @@
 #include "mainscreen.h"
 #include "modbus.h"
 #include "ecopower.h"
+#include "rtc.h"
 
 /* Macros --------------------------------------------------------------------*/
 #ifdef USE_FULL_ASSERT

@@ -22,12 +22,11 @@ typedef enum {
 
 
 /* Exported variables ---------------------------------------------------*/
-//extern bool redraw;
-//extern SCREEN_TypeDef screen;
+
 
 /* Exported functions ------------------------------------------------------- */
 void mainScreenInit(void);
-void DrawMainScreen(void);
+void updateScreen(void);
 void checkTouch(void);
 
 #endif

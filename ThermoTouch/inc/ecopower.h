@@ -9,6 +9,7 @@
 #define ECOPOWER_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 
 struct Tflags
 {
@@ -236,5 +237,17 @@ struct inputRegisters
 
 
 extern struct inputRegisters IR;
+
+
+
+
+
+void setHeat(uint8_t heat);
+
+void setFan(uint8_t heat);
+
+void setOnOff(bool on);
+
+
 
 #endif /* ECOPOWER_H_ */

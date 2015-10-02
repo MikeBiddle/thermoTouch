@@ -15,6 +15,7 @@
 #include "mainscreen.h"
 #include "buttonBmp.h"
 #include "button.h"
+#include "rtc.h"
 #include <stdbool.h>
 
 /** @addtogroup Thermoscreens
@@ -43,8 +44,6 @@ bool redraw;
  * @retval None
  */
 
-
-
 void checkTouch(void) {
 	uint8_t n;
 	uint16_t x, y;
@@ -54,7 +53,7 @@ void checkTouch(void) {
 			x = TS_State.touchX[0];
 			y = TS_State.touchY[0];
 			for (n = 0; n < buttonCount; n++)
-				if (buttonHit(n,x,y))
+				if (buttonHit(n, x, y))
 					buttonList[n].onClick();
 		}
 		lastTouch = TS_State.touchDetected;
@@ -66,26 +65,29 @@ void doNothing(void) {
 }
 
 void heatDown(void) {
-	BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
-	BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
+	if(IR.heat>0x20)
+		setHeat((IR.heat-0x20)&0xE0);
+	else
+		setHeat(0);
 
 }
 
 void heatUp(void) {
-	BSP_LCD_SetTextColor(LCD_COLOR_RED);
-	BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
+	if(IR.heat<0xE0)
+		setHeat((IR.heat+0x20)&0xE0);
+	else
+		setHeat(0xE0);
 
 }
 
 void fanDown(void) {
-	BSP_LCD_SetTextColor(LCD_COLOR_MAGENTA);
-	BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
-
+	if(IR.fan>0x7F)
+		setFan((IR.fan-0x40)&0xC0);
 }
 
 void fanUp(void) {
-	BSP_LCD_SetTextColor(LCD_COLOR_CYAN);
-	BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
+	if(IR.fan<0xC0)
+		setFan((IR.fan+0x40)&0xC0);
 
 }
 
@@ -108,76 +110,108 @@ void mainScreenInit() {
 
 }
 
-void DrawMainScreen() {
-	if (redraw) {
-		redraw = false;
-		switch (screen) {
-		case SCREEN_MAIN:
-			BSP_LCD_Clear(LCD_COLOR_WHITE);
-			BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-			BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
-			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-			BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-			BSP_LCD_SetFont(&Font24);
-			BSP_LCD_DisplayStringAt(0, 0, (uint8_t *) "Main Screen",
-					CENTER_MODE);
-			BSP_LCD_SetFont(&Font12);
-			BSP_LCD_DisplayStringAt(0, 30,
-					(uint8_t *) "Difficulties strengthen the mind, as labour does the body.",
-					CENTER_MODE);
-			BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-			BSP_LCD_DrawRect(10, 58, BSP_LCD_GetXSize() - 20,
-					BSP_LCD_GetYSize() - 64);
-			BSP_LCD_DrawRect(11, 59, BSP_LCD_GetXSize() - 22,
-					BSP_LCD_GetYSize() - 66);
+void drawScreenBackground() {
 
-			clearButtons();
-			addButton(12, 60, 100, 100, (uint8_t *) &buttonBmp, fanUp);
-			addButton(12, 162, 100, 100, (uint8_t *) &buttonBmp, fanDown);
-			addButton(368, 60, 100, 100, (uint8_t *) &buttonBmp, heatUp);
-			addButton(368, 162, 100, 100, (uint8_t *) &buttonBmp, heatDown);
-			addButton(240 - 50, 111, 100, 100, (uint8_t *) &buttonBmp,
-					goAlternateScreen);
+	redraw = false;
+	switch (screen) {
+	case SCREEN_MAIN:
+		BSP_LCD_Clear(LCD_COLOR_WHITE);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+		BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+		BSP_LCD_SetFont(&Font24);
+		BSP_LCD_DisplayStringAt(0, 0, (uint8_t *) "Main Screen", CENTER_MODE);
+		BSP_LCD_SetFont(&Font12);
+		BSP_LCD_DisplayStringAt(0, 30,
+				(uint8_t *) "Difficulties strengthen the mind, as labour does the body.",
+				CENTER_MODE);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+		BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
+		BSP_LCD_DisplayStringAt(250, 70,(uint8_t *) "Time : ",RIGHT_MODE);
+		BSP_LCD_DisplayStringAt(250, 80,(uint8_t *) "On/Off : ",RIGHT_MODE);
+		BSP_LCD_DisplayStringAt(250, 90,(uint8_t *) "Fan : ",RIGHT_MODE);
+		BSP_LCD_DisplayStringAt(250, 100,(uint8_t *) "Heat : ",RIGHT_MODE);
 
-			break;
-		case SCREEN_ALTERNATE:
-			BSP_LCD_Clear(LCD_COLOR_WHITE);
-			BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-			BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
-			BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-			BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-			BSP_LCD_SetFont(&Font24);
-			BSP_LCD_DisplayStringAt(0, 0, (uint8_t *) "Alternate Screen",
-					CENTER_MODE);
-			BSP_LCD_SetFont(&Font12);
-			BSP_LCD_DisplayStringAt(0, 30,
-					(uint8_t *) "A stitch in time would have confused Einstein.",
-					CENTER_MODE);
-			BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-			BSP_LCD_DrawRect(10, 58, BSP_LCD_GetXSize() - 20,
-					BSP_LCD_GetYSize() - 64);
-			BSP_LCD_DrawRect(11, 59, BSP_LCD_GetXSize() - 22,
-					BSP_LCD_GetYSize() - 66);
 
-			clearButtons();
-			addButton(240 - 150, 111, 100, 100, (uint8_t *) &buttonBmp, goMainScreen);
-			addButton(240 - 50, 111, 100, 100, (uint8_t *) &buttonBmp, goMainScreen);
-			addButton(240 + 50, 111, 100, 100, (uint8_t *) &buttonBmp, goMainScreen);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+		BSP_LCD_DrawRect(10, 58, BSP_LCD_GetXSize() - 20,
+				BSP_LCD_GetYSize() - 64);
+		BSP_LCD_DrawRect(11, 59, BSP_LCD_GetXSize() - 22,
+				BSP_LCD_GetYSize() - 66);
 
-			break;
+		clearButtons();
+		addButton(12, 60, 100, 100, (uint8_t *) &buttonBmp, fanUp);
+		addButton(12, 162, 100, 100, (uint8_t *) &buttonBmp, fanDown);
+		addButton(368, 60, 100, 100, (uint8_t *) &buttonBmp, heatUp);
+		addButton(368, 162, 100, 100, (uint8_t *) &buttonBmp, heatDown);
+		addButton(368-100, 111, 100, 100, (uint8_t *) &buttonBmp,
+				goAlternateScreen);
 
-		case SCREEN_ERROR_TS:
-			BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
-			BSP_LCD_SetTextColor(LCD_COLOR_RED);
-			BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 95,
-					(uint8_t *) "ERROR", CENTER_MODE);
-			BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 80,
-					(uint8_t *) "Touchscreen cannot be initialized",
-					CENTER_MODE);
-			break;
+		break;
+	case SCREEN_ALTERNATE:
+		BSP_LCD_Clear(LCD_COLOR_WHITE);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+		BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
+		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+		BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+		BSP_LCD_SetFont(&Font24);
+		BSP_LCD_DisplayStringAt(0, 0, (uint8_t *) "Alternate Screen",
+				CENTER_MODE);
+		BSP_LCD_SetFont(&Font12);
+		BSP_LCD_DisplayStringAt(0, 30,
+				(uint8_t *) "A stitch in time would have confused Einstein.",
+				CENTER_MODE);
+		BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+		BSP_LCD_DrawRect(10, 58, BSP_LCD_GetXSize() - 20,
+				BSP_LCD_GetYSize() - 64);
+		BSP_LCD_DrawRect(11, 59, BSP_LCD_GetXSize() - 22,
+				BSP_LCD_GetYSize() - 66);
 
-		}
+		clearButtons();
+		addButton(240 - 150, 111, 100, 100, (uint8_t *) &buttonBmp,
+				goMainScreen);
+		addButton(240 - 50, 111, 100, 100, (uint8_t *) &buttonBmp,
+				goMainScreen);
+		addButton(240 + 50, 111, 100, 100, (uint8_t *) &buttonBmp,
+				goMainScreen);
 
+		break;
+
+	case SCREEN_ERROR_TS:
+		BSP_LCD_SetBackColor(LCD_COLOR_WHITE);
+		BSP_LCD_SetTextColor(LCD_COLOR_RED);
+		BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 95, (uint8_t *) "ERROR",
+				CENTER_MODE);
+		BSP_LCD_DisplayStringAt(0, BSP_LCD_GetYSize() - 80,
+				(uint8_t *) "Touchscreen cannot be initialized", CENTER_MODE);
+		break;
 	}
 }
 
+void updateScreen() {
+	uint8_t str[20];
+	if (redraw)
+		drawScreenBackground();
+	switch (screen) {
+	case SCREEN_MAIN:
+		BSP_LCD_DisplayStringAt(220, 70,rtcTimeString(),LEFT_MODE);
+
+		sprintf(str,"0x%2.2X",IR.flags.on);
+		BSP_LCD_DisplayStringAt(220, 80,str,LEFT_MODE);
+
+		sprintf(str,"0x%2.2X",IR.fan);
+		BSP_LCD_DisplayStringAt(220, 90,str,LEFT_MODE);
+
+		sprintf(str,"0x%2.2X",IR.heat);
+		BSP_LCD_DisplayStringAt(220, 100,str,LEFT_MODE);
+
+		break;
+	case SCREEN_ALTERNATE:
+		break;
+
+	case SCREEN_ERROR_TS:
+		break;
+
+	}
+}

@@ -38,8 +38,9 @@
 /* Exported functions ------------------------------------------------------- */
 
 void modbusInit(int baud);
+
 void modbusUpdate();
 
-
+void modbusWriteHoldingReg(uint16_t reg,uint16_t value);
 
 #endif /* INC_MODBUS_H_ */
