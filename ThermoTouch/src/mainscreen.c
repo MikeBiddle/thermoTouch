@@ -120,7 +120,7 @@ void drawScreenBackground() {
 		BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-		BSP_LCD_SetFont(&Font12); //24
+		BSP_LCD_SetFont(&Font24);
 		BSP_LCD_DisplayStringAt(0, 0, (uint8_t *) "Main Screen", CENTER_MODE);
 		BSP_LCD_SetFont(&Font12);
 		BSP_LCD_DisplayStringAt(0, 30,
