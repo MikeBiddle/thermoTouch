@@ -292,7 +292,7 @@ int main(void) {
 		if(elapsed100ms())
 		{
 			checkTouch();
-			updateScreen()
+			updateScreen();
 
 		}
 		modbusUpdate();
