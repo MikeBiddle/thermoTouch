@@ -120,7 +120,7 @@ void drawScreenBackground() {
 		BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 56);
 		BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 		BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-		BSP_LCD_SetFont(&Font24);
+		BSP_LCD_SetFont(&Font24); //24
 		BSP_LCD_DisplayStringAt(0, 0, (uint8_t *) "Main Screen", CENTER_MODE);
 		BSP_LCD_SetFont(&Font12);
 		BSP_LCD_DisplayStringAt(0, 30,
@@ -192,26 +192,28 @@ void drawScreenBackground() {
 void updateScreen() {
 	uint8_t str[20];
 	if (redraw)
+	{
 		drawScreenBackground();
-	switch (screen) {
-	case SCREEN_MAIN:
-		BSP_LCD_DisplayStringAt(220, 70,rtcTimeString(),LEFT_MODE);
+		switch (screen) {
+		case SCREEN_MAIN:
+			BSP_LCD_DisplayStringAt(220, 70,rtcTimeString(),LEFT_MODE);
 
-		sprintf(str,"0x%2.2X",IR.flags.on);
-		BSP_LCD_DisplayStringAt(220, 80,str,LEFT_MODE);
+			sprintf(str,"0x%2.2X",IR.flags.on);
+			BSP_LCD_DisplayStringAt(220, 80,str,LEFT_MODE);
 
-		sprintf(str,"0x%2.2X",IR.fan);
-		BSP_LCD_DisplayStringAt(220, 90,str,LEFT_MODE);
+			sprintf(str,"0x%2.2X",IR.fan);
+			BSP_LCD_DisplayStringAt(220, 90,str,LEFT_MODE);
 
-		sprintf(str,"0x%2.2X",IR.heat);
-		BSP_LCD_DisplayStringAt(220, 100,str,LEFT_MODE);
+			sprintf(str,"0x%2.2X",IR.heat);
+			BSP_LCD_DisplayStringAt(220, 100,str,LEFT_MODE);
 
-		break;
-	case SCREEN_ALTERNATE:
-		break;
+			break;
+		case SCREEN_ALTERNATE:
+			break;
 
-	case SCREEN_ERROR_TS:
-		break;
+		case SCREEN_ERROR_TS:
+			break;
 
+		}
 	}
 }
