@@ -291,8 +291,9 @@ int main(void) {
 	while (1) {
 		if(elapsed100ms())
 		{
-			updateScreen();
 			checkTouch();
+			updateScreen();
+
 		}
 		modbusUpdate();
 	}
